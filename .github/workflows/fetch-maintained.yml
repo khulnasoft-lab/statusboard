@@ -1,0 +1,46 @@
+name: Fetch Maintained Projects
+
+on:
+  workflow_dispatch:
+  schedule:
+    # "Everyday at 11:00 UTC (4:00 PT)" https://crontab.guru/#11*_*_*
+    - cron: "0 11 * * *"
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    outputs:
+      has_changes: ${{ steps.status.outputs.has_changes }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref_name }}
+      - name: Setup git user
+        run: |
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: npm
+      - name: Update npm to latest
+        run: npm i --prefer-online --no-fund --no-audit -g npm@latest
+      - run: npm -v
+      - run: npm i --ignore-scripts --no-audit --no-fund --package-lock
+      - run: npm run fetch:maintained -w data
+        continue-on-error: true
+        env:
+          AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check for changes
+        id: status
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "::set-output name=has_changes::1"
+          fi
+      - name: Commit changes
+        if: steps.status.outputs.has_changes == '1'
+        run: |
+          git add .
+          git commit -m "chore: update maintained projects"
+          git push origin ${{ github.ref_name }}

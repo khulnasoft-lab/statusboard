@@ -1,0 +1,53 @@
+{
+  "name": "statusboard",
+  "version": "1.0.0",
+  "description": "Community &amp; Open Source Statusboard",
+  "private": true,
+  "keywords": [],
+  "author": "GitHub Inc.",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/khulnasoft-lab/statusboard/issues"
+  },
+  "homepage": "https://github.com/khulnasoft-lab/statusboard#readme",
+  "workspaces": [
+    "workspaces/*"
+  ],
+  "devDependencies": {
+    "@npmcli/eslint-config": "^4.0.0",
+    "@npmcli/template-oss": "4.21.3",
+    "tap": "^16.3.0"
+  },
+  "templateOSS": {
+    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
+    "version": "4.21.3",
+    "content": "./scripts/template-oss"
+  },
+  "tap": {
+    "test-ignore": "^(workspaces)/",
+    "nyc-arg": [
+      "--exclude",
+      "workspaces/**",
+      "--exclude",
+      "tap-snapshots/**"
+    ]
+  },
+  "scripts": {
+    "template-oss-apply": "template-oss-apply --force",
+    "lint": "eslint \"**/*.{js,cjs,ts,mjs,jsx,tsx}\"",
+    "postlint": "template-oss-check",
+    "lintfix": "npm run lint -- --fix",
+    "snap": "tap",
+    "test": "tap",
+    "posttest": "npm run lint",
+    "test-all": "npm run test -ws -iwr --if-present",
+    "lint-all": "npm run lint -ws -iwr --if-present"
+  },
+  "files": [
+    "bin/",
+    "lib/"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
